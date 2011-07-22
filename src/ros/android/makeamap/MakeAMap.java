@@ -33,12 +33,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.LinearLayout;
-import org.ros.Node;
-import org.ros.Publisher;
-import org.ros.ServiceResponseListener;
-import org.ros.Subscriber;
-import org.ros.exception.RosInitException;
-import org.ros.ServiceClient;
+import org.ros.node.Node;
+import org.ros.node.topic.Publisher;
+import org.ros.node.service.ServiceResponseListener;
+import org.ros.node.topic.Subscriber;
+import org.ros.exception.RosException;
+import org.ros.exception.RemoteException;
+import org.ros.node.service.ServiceClient;
 import org.ros.message.Message;
 import org.ros.message.app_manager.AppStatus;
 import org.ros.message.geometry_msgs.Twist;
@@ -237,7 +238,7 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
       NameResolver appNamespace = getAppNamespace(node);
       cameraView = (SensorImageView) findViewById(R.id.image);
       Log.i("MakeAMap", "init cameraView");
-      cameraView.start(node, appNamespace.resolve(cameraTopic));
+      cameraView.start(node, appNamespace.resolve(cameraTopic).toString());
       cameraView.post(new Runnable() {
 
         @Override
@@ -246,9 +247,9 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
         }
       });
       Log.i("MakeAMap", "init twistPub");
-      twistPub = node.createPublisher(baseControlTopic, "geometry_msgs/Twist");
+      twistPub = node.newPublisher(baseControlTopic, "geometry_msgs/Twist");
       createPublisherThread(twistPub, touchCmdMessage, 10);
-    } catch (RosInitException e) {
+    } catch (RosException e) {
       Log.e("MakeAMap", "initRos() caught exception: " + e.toString() + ", message = " + e.getMessage());
     }
   }
@@ -268,7 +269,7 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
       
       mapView.start(node);
       startApp();
-    } catch (RosInitException ex) {
+    } catch (RosException ex) {
       safeToastStatus("Failed: " + ex.getMessage());
     }
   }
@@ -287,7 +288,7 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
           }
 
           @Override
-          public void onFailure(Exception e) {
+          public void onFailure(RemoteException e) {
             safeToastStatus("Failed: " + e.getMessage());
           }
         });
@@ -388,7 +389,7 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
 	    Log.i("MakeAMap", "Map should soon be named " + newName);
 	    int debug = 0;
 	    ServiceClient<NameLatestMap.Request, NameLatestMap.Response> nameMapServiceClient =
-		getNode().createServiceClient("name_latest_map", "map_store/NameLatestMap");
+		getNode().newServiceClient("name_latest_map", "map_store/NameLatestMap");
 	    NameLatestMap.Request nameMapRequest = new NameLatestMap.Request();
 	    nameMapRequest.map_name = newName;
 	    nameMapServiceClient.call(nameMapRequest, new ServiceResponseListener<NameLatestMap.Response>() {
@@ -398,7 +399,7 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
 			safeToastStatus("Map has been named " + newName);
 		    }
 
-		    @Override public void onFailure(Exception e) {
+		    @Override public void onFailure(RemoteException e) {
 			Log.i("MakeAMap", "setMapName() Failure");
 			safeToastStatus("Naming map failed: " + e.getMessage());
 		    }
