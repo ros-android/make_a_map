@@ -22,6 +22,16 @@
                                android:layout_height="fill_parent"
                                android:layout_weight=".25"
                                android:id="@+id/map_view"/>
+    <Button android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="Refresh Map"
+	    android:onClick="refreshMap"
+	    android:id="@+id/refresh_button"/>
+    <Button android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="Save Map"
+	    android:onClick="saveMap"
+	    android:id="@+id/save_map"/>
     <ImageView android:layout_width="fill_parent"
                android:layout_height="fill_parent"
                android:layout_weight=".25"

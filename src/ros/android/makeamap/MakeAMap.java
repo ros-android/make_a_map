@@ -150,6 +150,14 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
     cameraView.setClickable(false);
   }
 
+  public void saveMap(View view) {
+    showDialog(NAME_MAP_DIALOG_ID);
+  }
+  
+  public void refreshMap(View view) {
+    mapView.refreshMap();
+  }
+  
   /**
    * Swap the camera and map views.
    */
