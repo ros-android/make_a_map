@@ -49,7 +49,6 @@ import org.ros.service.map_store.NameLatestMap;
 import ros.android.activity.AppManager;
 import ros.android.activity.RosAppActivity;
 import ros.android.views.SensorImageView;
-import ros.android.util.Dashboard;
 import ros.android.views.MapView;
 
 /**
@@ -65,7 +64,6 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
   private float motionY;
   private float motionX;
   private Subscriber<AppStatus> statusSub;
-  private Dashboard dashboard;
   private ViewGroup mainLayout;
   private ViewGroup sideLayout;
   private String robotAppName;
@@ -83,16 +81,10 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
+    setDefaultAppName("turtlebot_teleop/android_make_a_map");
+    setDashboardResource(R.id.top_bar);
+    setMainWindowResource(R.layout.main);
     super.onCreate(savedInstanceState);
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
-    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    setContentView(R.layout.main);
-
-    robotAppName = getIntent().getStringExtra(AppManager.PACKAGE + ".robot_app_name");
-    if( robotAppName == null ) {
-      robotAppName = "turtlebot_teleop/android_make_a_map";
-    }
 
     if (getIntent().hasExtra("base_control_topic")) {
       baseControlTopic = getIntent().getStringExtra("base_control_topic");
@@ -124,10 +116,6 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
     // cameraView.setOnTouchListener(this);
     touchCmdMessage = new Twist();
 
-    dashboard = new Dashboard(this);
-    dashboard.setView((LinearLayout)findViewById(R.id.top_bar),
-                      new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 
-                                                    LinearLayout.LayoutParams.WRAP_CONTENT));
 
     mainLayout = (ViewGroup) findViewById(R.id.main_layout);
     sideLayout = (ViewGroup) findViewById(R.id.side_layout);
@@ -216,7 +204,6 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
       pubThread = null;
     }
     mapView.stop();
-    dashboard.stop();
     super.onNodeDestroy(node);
   }
 
@@ -250,10 +237,7 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
     Log.i("MakeAMap", "startAppFuture");
     super.onNodeCreate(node);
     try {
-      dashboard.start(node);
-      
       mapView.start(node);
-      startApp();
       NameResolver appNamespace = getAppNamespace(node);
       cameraView = (SensorImageView) findViewById(R.id.image);
       Log.i("MakeAMap", "init cameraView");
@@ -271,19 +255,6 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
     } catch (RosException ex) {
       safeToastStatus("Failed: " + ex.getMessage());
     }
-  }
-
-  private void startApp() {
-    appManager.startApp(robotAppName,
-        new ServiceResponseListener<StartApp.Response>() {
-          @Override
-          public void onSuccess(StartApp.Response message) {
-          }
-          @Override
-          public void onFailure(RemoteException e) {
-            safeToastStatus("Failed: " + e.getMessage());
-          }
-        });
   }
 
   @Override
@@ -401,14 +372,5 @@ public class MakeAMap extends RosAppActivity implements OnTouchListener {
 	    safeToastStatus("Naming map couldn't even start: " + ex.getMessage());
 	}
     }
-
-  private void safeToastStatus(final String message) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        Toast.makeText(MakeAMap.this, message, Toast.LENGTH_SHORT).show();
-      }
-    });
-  }
 
 }
