@@ -32,11 +32,11 @@
 	    android:text="Save Map"
 	    android:onClick="saveMap"
 	    android:id="@+id/save_map"/>
-    <ImageView android:layout_width="fill_parent"
-               android:layout_height="fill_parent"
-               android:layout_weight=".25"
-               android:adjustViewBounds="true"
-               android:src="@drawable/joystick_white"
-               android:id="@+id/joystick"/>
+    <ros.android.views.JoystickView android:layout_width="fill_parent"
+				    android:layout_height="fill_parent"
+				    android:layout_weight=".25"
+				    android:adjustViewBounds="true"
+				    android:src="@drawable/joystick_white"
+				    android:id="@+id/joystick"/>
   </LinearLayout>
 </LinearLayout>
