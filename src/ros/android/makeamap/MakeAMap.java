@@ -35,7 +35,7 @@ import org.ros.exception.RosException;
 import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceClient;
 import org.ros.namespace.NameResolver;
-import org.ros.service.map_store.NameLatestMap;
+import org.ros.service.map_store.SaveMap;
 import ros.android.activity.RosAppActivity;
 import ros.android.views.SensorImageView;
 import ros.android.views.MapView;
@@ -274,12 +274,12 @@ public class MakeAMap extends RosAppActivity {
     try {
       Log.i("MakeAMap", "Map should soon be named " + newName);
       int debug = 0;
-      ServiceClient<NameLatestMap.Request, NameLatestMap.Response> nameMapServiceClient =
-        getNode().newServiceClient("name_latest_map", "map_store/NameLatestMap");
-      NameLatestMap.Request nameMapRequest = new NameLatestMap.Request();
+      ServiceClient<SaveMap.Request, SaveMap.Response> nameMapServiceClient =
+        getNode().newServiceClient("save_map", "map_store/SaveMap");
+      SaveMap.Request nameMapRequest = new SaveMap.Request();
       nameMapRequest.map_name = newName;
-      nameMapServiceClient.call(nameMapRequest, new ServiceResponseListener<NameLatestMap.Response>() {
-          @Override public void onSuccess(NameLatestMap.Response message) {
+      nameMapServiceClient.call(nameMapRequest, new ServiceResponseListener<SaveMap.Response>() {
+          @Override public void onSuccess(SaveMap.Response message) {
             Log.i("MakeAMap", "setMapName() Success ");
             // TODO: put success/failure info into response and show it.
             safeToastStatus("Map has been named " + newName);
